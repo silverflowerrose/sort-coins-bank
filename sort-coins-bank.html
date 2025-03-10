@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Sorting Game</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #game-container {
+            position: relative;
+            width: 900px;
+            height: 200px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-between;
+        }
+        .coin {
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+            margin: 10px;
+            cursor: grab;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.2s, opacity 0.3s;
+        }
+        .coin:hover {
+            transform: scale(1.1);
+        }
+        .coin:active {
+            cursor: grabbing;
+        }
+        .bank {
+            width: 500px;
+            height: 200px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        #penny-bank {
+            background-image: url('https://i.imgur.com/fBTveif.png');
+        }
+        #nickel-bank {
+            background-image: url('https://i.imgur.com/xVFmjFH.png');
+        }
+        #dime-bank {
+            background-image: url('https://i.imgur.com/1YIMEyW.png');
+        }
+        #score {
+            font-size: 24px;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sort the coins into their jars!</h1>
+    <div id="game-container">
+        <div id="penny-bank" class="bank" ondrop="drop(event, 'penny')" ondragover="allowDrop(event)"></div>
+        <div id="nickel-bank" class="bank" ondrop="drop(event, 'nickel')" ondragover="allowDrop(event)"></div>
+        <div id="dime-bank" class="bank" ondrop="drop(event, 'dime')" ondragover="allowDrop(event)"></div>
+    </div>
+    <div>
+        <div id="penny1" class="coin penny" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/ajVOHrK.png');">
+        </div>
+        <div id="nickel1" class="coin nickel" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/kegKQkY.png');">
+        </div>
+        <div id="dime1" class="coin dime" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/jOlr7BA.png');">
+        </div>
+        <div id="penny2" class="coin penny" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/ajVOHrK.png');">
+        </div>
+        <div id="nickel2" class="coin nickel" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/kegKQkY.png');">
+        </div>
+        <div id="dime2" class="coin dime" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/jOlr7BA.png');">
+        </div>
+    </div>
+    
+    <div id="score">Total: $0.00</div>
+    
+    <script>
+        let total = 0;
+        const coinValues = { penny: 0.01, nickel: 0.05, dime: 0.10 };
+        const maxTotal = 1.00;
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function drop(event, bankType) {
+            event.preventDefault();
+
+            if (total >= maxTotal) return;
+
+            let coinId = event.dataTransfer.getData("text");
+            let coin = document.getElementById(coinId);
+
+            if (coin.classList.contains(bankType)) {
+                coin.style.transition = "opacity 0.3s, transform 0.3s";
+                coin.style.transform = "scale(0.5) translateY(50px)";
+                coin.style.opacity = '0';
+                
+                setTimeout(() => coin.remove(), 300);
+
+                total += coinValues[bankType];
+                updateScore();
+                playDropSound();
+            } else {
+                coin.style.transition = "transform 0.3s";
+                coin.style.transform = "translateY(-10px)";
+                setTimeout(() => coin.style.transform = "translateY(0px)", 300);
+                playWrongSound();
+            }
+        }
+
+        function updateScore() {
+            document.getElementById("score").textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        function playDropSound() {
+            const audio = new Audio('https://raw.githubusercontent.com/silverflowerrose/coindropfile/main/coin-drop-82392.mp3');
+            audio.play();
+        }
+
+        function playWrongSound() {
+            const audio = new Audio('https://github.com/silverflowerrose/wronganswermp3/raw/refs/heads/main/wrong%20answer%20sound.mp3');
+            audio.play();
+        }
+    </script>
+</body>
+</html>
